@@ -1,0 +1,213 @@
+// --------------------------------------------
+// Mod setup
+// --------------------------------------------
+// Basics
+BACKUP ~yeslicknpc/backup~
+AUTHOR ~Pixel Kaiser, K'aeloree (kae@spellholdstudios.net)~
+VERSION ~v1.1~
+README ~yeslicknpc/yeslick_readme.html~
+
+// README ~yeslicknpc/yeslick_readme.html~
+
+
+// --------------------------------------------
+// Yeslick NPC Mod v1.1
+// --------------------------------------------
+// Component setup
+BEGIN ~Yeslick NPC for BGII: SoA~
+  REQUIRE_FILE ~data/25dialog.bif~ ~ToB is not installed! Please install the Throne of Bhaal expansion before installing Yeslick.~
+  REQUIRE_FILE ~data/25scripts.bif~ ~ToB is not installed! Please install the Throne of Bhaal expansion before installing Yeslick.~
+
+// Adds custom IsValidForPartyDialogue state used throughout yeslicknpc
+APPEND ~STATE.IDS~
+  ~0x80101FEF CD_STATE_NOTVALID~
+  UNLESS ~CD_STATE_NOTVALID~
+  
+  
+// Kit
+COPY ~yeslicknpc/2da/lk#yk.2da~ ~override~
+
+ADD_KIT ~LK#YK~
+~LK#YK 0 0 0 0 0 0 0 0~ 
+~LK#YK 0 1 0 0 1 0 0 1 0 1 1 0 0 1 1 1 0 1 0 0 0 0 1 1 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0~
+~LK#YK 0 0 0 0 9 0~ 
+~LK#YK 0 0 0 0 0 0~ 
+~LK#YK 0 0 0 0 0 0~ 
+~LK#YK 0 0 0 0 0 0~
+~LK#YK 1 0 0 1 0 0 0 0 0~ 
+~LK#YK 0 0 0 0 0 0~ 
+~override\LK#YK.2da~
+~~
+~0x00100000 3~
+~Cl0~
+~PLAT04 * HELM07 BAG20 RING07 RING31 * BOOT01 AMUL20 BRAC09 BELT04 SW1H31 CLCK07 SHLD24 BAG02 BAG04 * * * *~ 
+SAY ~Alaghor of Clangeddin~ 
+SAY ~Alaghor of Clangeddin~
+SAY ~ALAGHOR OF CLANGEDDIN: Also called the clerics of Clangeddin. Clangeddin Silverbeard is the dwarven god of battle, war, and bravery; his titles include the Father of Battle and the Lord of the Twin Axes. He delights in battle, although he does not tolerate treachery or deceit, and he expects his followers to do the same. He and his followers hate giants and have trained their fellow dwarves in special ways to fight them.
+
+ADVANTAGES:
+
+-At level 8 may cast "Spiritual Axe" once per day
+-At level 14 may cast "Strength" once per day. It works as the Wizard spell of the same name.
+-At level 16 may cast "Axe Storm of Clangeddin" which work as "Blade Barrier" cleric spell.
+
+DISADVANTAGES:
+
+- Only for dwarves
+- Only for Lawful Neutral or Lawful Good characters~
+
+// Alaghar of Clangeddin Kit
+
+// Strength
+COPY_EXISTING ~SPWI214.spl~ ~override/lk#y2.spl~
+WRITE_SHORT 0x1C 4
+WRITE_LONG 0x34 1
+READ_LONG 0x64 "offset_abil"
+READ_SHORT  0x68 "num_abil"
+READ_ASCII ("%offset_abil%" + 0x04) "bam"            
+WRITE_EVALUATED_ASCII 0x3A "%bam%"                
+SAY NAME1 ~Strength~
+SAY NAME2 ~Strength~                           
+SAY UNIDENTIFIED_DESC ~Clangeddin's Strength.~
+SAY DESC ~Clangeddin's Strength.~
+WHILE (0 < "%num_abil%")
+BEGIN
+WRITE_SHORT (("%offset_abil%" + 0x02) + (("%num_abil%" - 1) * 0x28)) 4
+SET "num_abil" = ("%num_abil%" - 1)
+END 
+
+// Blade Barrier - Axe Storm of Clangeddin
+COPY_EXISTING ~SPPR603.spl~ ~override/lk#y3.spl~
+WRITE_SHORT 0x1C 4                        
+WRITE_LONG 0x34 1
+READ_LONG 0x64 "offset_abil"
+READ_SHORT  0x68 "num_abil"
+READ_ASCII ("%offset_abil%" + 0x04) "bam"            
+WRITE_EVALUATED_ASCII 0x3A "%bam%"                
+SAY NAME1 ~Axe Storm of Clangeddin~                           
+SAY NAME2 ~Axe Storm of Clangeddin~
+SAY UNIDENTIFIED_DESC ~Axe Storm of Clangeddin.~
+SAY DESC ~Axe Storm of Clangeddin.~
+WHILE (0 < "%num_abil%")
+BEGIN
+WRITE_SHORT (("%offset_abil%" + 0x02) + (("%num_abil%" - 1) * 0x28)) 4
+SET "num_abil" = ("%num_abil%" - 1)
+END 
+
+// Spiritual Axe
+
+COPY ~yeslicknpc/spells/lk#y1.spl~ ~override/lk#y1.spl~
+SAY NAME1 ~Spiritual Axe~
+SAY NAME2 ~Spiritual Axe~
+
+COPY ~yeslicknpc/items/lk#y1a.itm~ ~override/lk#y1a.itm~
+SAY NAME1 ~Spiritual Axe~
+SAY NAME2 ~Spiritual Axe~
+
+
+
+
+///////SYMBOL
+
+COPY ~yeslicknpc/items/lk#ysy1i.itm~ ~override/lk#ysy1i.itm~
+SAY NAME1 ~Holy Symbol of Clangeddin~
+SAY NAME2 ~Holy Symbol of Clangeddin~
+SAY DESC ~Only those most worthy and devoted servants of the Clangeddin are granted these powerful holy symbols. 
+
+STATISTICS:
+
+   Grants an additional 6th and 7th level spell.
+   5% Magic Resistance while worn
+   +2 AC vs. Giants
+
+Usuable By:
+Dwarf
+Lawful Good
+Lawful Neutral~
+
+// Compiling dialogue...
+PRINT ~Compiling dialogue...~
+
+COMPILE ~yeslicknpc/dialogue/lk#yesl.d~
+COMPILE ~yeslicknpc/dialogue/lk#yesj.d~
+COMPILE ~yeslicknpc/dialogue/blk#yes.d~
+COMPILE ~yeslicknpc/dialogue/lk#yesp.d~
+
+
+// Compiling scripts...
+PRINT ~Compiling and extending scripts...~
+
+COMPILE ~yeslicknpc/scripts/lk#yesl.baf~
+EXTEND_BOTTOM ~ar2010.bcs~ ~yeslicknpc/scripts/ar2010.baf~
+
+
+// Copying images and creatures
+PRINT ~Copying images and creatures...~
+
+COPY ~yeslicknpc/images~ ~override~
+
+COPY ~yeslicknpc/wav~ ~override~
+
+COPY ~yeslicknpc/creatures/lk#yesl.cre~ ~override/lk#yesl.cre~
+  SAY NAME1 ~Yeslick~
+  SAY NAME2 ~Yeslick~
+  WRITE_EVALUATED_ASCII DIALOG          ~%DEST_RES%~ #8
+  WRITE_EVALUATED_ASCII DEATHVAR        ~LK#YESLK~ #32
+  WRITE_EVALUATED_ASCII SCRIPT_OVERRIDE ~%DEST_RES%~ #8
+  SAY BIO ~When asked about his past, Yeslick chuckles grimly.  "There ain't nothin' there ye be wantin' to know, young 'un.  Trust me."  From what you have gleaned, Yeslick is peculiar for a dwarf; a follower of Vergadain, the Dwarven god of wealth and luck and Clangeddin, Dwarven god of war, he is an unassuming companion with an aversion to alcohol and the undead. You know little about his history beyond that he grew up in the Dales to the north and that heat makes him extremely irritable.~
+//  SAY MORALE ~~
+  SAY LEADER ~Slow and steady while I'm leader.~ [lk#yesb]
+  SAY TIRED ~Even dwarves need to rest. I can't walk much further.~ [lk#yesc]
+  SAY BORED ~Why'd I leave my cell if I am to stand about doing nothing?~ [lk#yesd]
+  SAY BATTLE_CRY1 ~Argh!~ [lk#yes38]
+  SAY BATTLE_CRY2 ~Clangeddin's might, be with us!~ [lk#yesa]
+  SAY BATTLE_CRY3 ~Begone!~ [lk#yes0]
+  SAY BATTLE_CRY4 ~Enemies we be.~ [lk#yes8]
+  SAY BATTLE_CRY5 ~I swing a mean axe!~ [lk#yes9]
+  SAY DYING ~Aaaauugh!~ [lk#yesm]
+  SAY HURT ~Ill I am! Now when a dwarf says he's sick, you know it's serious!~ [lk#yese]
+  SAY AREA_DUNGEON ~'Tis just like the tunnels of my old clan!~ [lk#yesp]
+  SAY AREA_CITY ~A friendly face is a blessed sight in these times.~ [lk#yeso]
+  SAY AREA_FOREST ~Your ego is positively elven! Drop it a notch--lest I do it for you!~ [lk#yesn]
+  SAY AREA_DAY ~I prefer the stone of my cell o'er this wide-open empty!~ [lk#yesq]
+  SAY AREA_NIGHT ~I prefer the stone of my cell o'er this wide-open empty!~ [lk#yesr]
+  SAY SELECT_COMMON1 ~You need something?~ [lk#yesf]
+  SAY SELECT_COMMON2 ~Whate'er ye need!~ [lk#yesg]
+  SAY SELECT_COMMON3 ~Ye need only ask.~ [lk#yesh]
+  SAY SELECT_COMMON4 ~Kind words are always appreciated.~ [lk#yesv]
+//  SAY SELECT_COMMON5 ~~
+//  SAY SELECT_COMMON6 ~~
+  SAY SELECT_ACTION1 ~As you will.~ [lk#yesi]
+  SAY SELECT_ACTION2 ~Clangeddin's will be done.~ [lk#yesj]
+  SAY SELECT_ACTION3 ~Be glad.~ [lk#yesk]
+  SAY SELECT_ACTION4 ~My father? Was a miner. And my mother? Was a miner before him.~ [lk#yesx]
+  SAY SELECT_ACTION5 ~Ay, who's there now?~ [lk#yesy]
+//  SAY SELECT_ACTION6 ~~
+//  SAY SELECT_ACTION7 ~~
+  SAY SELECT_RARE1 ~You load sixteen tons, what do you get? Another day older--and deeper in debt.~ [lk#yest]
+  SAY SELECT_RARE2 ~Friendships last when gold is long gone.~ [lk#yesu]
+  SAY CRITICAL_HIT ~Erh!~ [lk#yesl]
+  SAY CRITICAL_MISS ~I shouldn't have got out of bed this morn.~ [lk#yes1]
+//  SAY TARGET_IMMUNE ~~
+  SAY INVENTORY_FULL ~'I've been through enough!~ [lk#yes3]
+  SAY HAPPY ~We do good! 'Tis as my clan was, long ago.~ [lk#yes04]
+  SAY UNHAPPY_ANNOYED ~There be dark horizons if we don't change our ways.~ [lk#yes2]
+  SAY UNHAPPY_SERIOUS ~I've seen enough greed and evil! Change your ways, lest enemies we be!~ [lk#yes10]
+  SAY UNHAPPY_BREAKING ~Ye be no better than the throne themselves! I'll not stand by while this happens!~ [lk#yes11]
+  SAY SPELL_DISRUPTED ~You needn't take such pleasure in it!~ [lk#yes6]
+  SAY SET_A_TRAP ~Violence solves only the simplest problems. You must think your way through the tough ones.~ [lk#yes7]
+  SAY HIDDEN_IN_SHADOWS ~Watch what you say.~ [lk#yes5]
+  SAY PICKED_POCKET ~'Twould be good if you tithed a few coins now and then. The favour of gods is worth a few gold.~ [lk#yes4]
+
+// Appends
+PRINT ~Appending files...~
+
+APPEND ~interdia.2da~ ~LK#YESLK BLK#YES~
+   UNLESS ~LK#YESLK~
+
+APPEND ~pdialog.2da~ ~LK#YESLK LK#YESP LK#YESJ LK#YESL~
+  UNLESS ~LK#YESLK~
+
+//Items
+
+COPY ~yeslicknpc/items/lk#yesw.itm~ ~override/lk#yesw.itm~
